@@ -4,12 +4,6 @@ import { compression } from 'vite-plugin-compression2'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-    base: "https://cutbypham.github.io/chat-bubbles-for-youtube",
-    server: {
-        port: 3000
-    },
-    plugins: [
-        react(),
-        compression()
-    ]
+  base: '/chat-bubbles-for-youtube/',
+  plugins: [react(), compression()],
 })

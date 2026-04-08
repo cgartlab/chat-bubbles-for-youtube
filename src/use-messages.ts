@@ -1,10 +1,25 @@
 import { useCallback, useState } from 'react'
+import { BubbleStyle } from './bubble'
+
+export interface StyleParams {
+  fillColour: string
+  strokeColour: string
+  borderRadius: number
+  opacity: number
+  borderWidth: number
+  blur: number
+  shadowIntensity: number
+  styleType: BubbleStyle
+  gradientStart: string
+  gradientEnd: string
+}
 
 export interface Message {
   id: number
   text: string
   height: number
   timeout: number
+  styleParams?: StyleParams
 }
 
 const useMessages = (initialValue: Array<Message> = []) => {

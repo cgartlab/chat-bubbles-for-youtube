@@ -1,7 +1,7 @@
 import { AnimatePresence } from 'framer-motion'
 import { useCallback, useState } from 'react'
 import './App.css'
-import Bubble from './bubble'
+import Bubble, { BubbleStyle } from './bubble'
 import BubbleInput from './bubble-input'
 import Chat from './chat'
 import useMessages from './use-messages'
@@ -10,9 +10,20 @@ import { SketchPicker } from 'react-color'
 function App() {
   const [messages, addMessage] = useMessages([])
   const [newMessage, setNewMessage] = useState('')
-  const [fillColour, setFillColour] = useState('#e6e5eb')
-  const [strokeColour, setStrokeColour] = useState('#000000')
+  const [fillColour, setFillColour] = useState('#6366f1')
+  const [strokeColour, setStrokeColour] = useState('#ffffff')
   const [bubbleTimeout, setBubbleTimeout] = useState(500)
+  
+  // New style parameters
+  const [borderRadius, setBorderRadius] = useState(30)
+  const [opacity, setOpacity] = useState(1)
+  const [borderWidth, setBorderWidth] = useState(0)
+  const [blur, setBlur] = useState(0)
+  const [shadowIntensity, setShadowIntensity] = useState(1)
+  const [styleType, setStyleType] = useState<BubbleStyle>('solid')
+  const [gradientStart, setGradientStart] = useState('#6366f1')
+  const [gradientEnd, setGradientEnd] = useState('#8b5cf6')
+  const [chatBackground, setChatBackground] = useState('#00a000')
 
   const handleSubmit = useCallback(
     (bubbleHeight: number) => {
@@ -21,46 +32,48 @@ function App() {
           id: +new Date(),
           text: newMessage,
           height: bubbleHeight,
-          timeout: bubbleTimeout
+          timeout: bubbleTimeout,
+          styleParams: {
+            fillColour,
+            strokeColour,
+            borderRadius,
+            opacity,
+            borderWidth,
+            blur,
+            shadowIntensity,
+            styleType,
+            gradientStart,
+            gradientEnd
+          }
         })
         setNewMessage('')
       }
     },
-    [newMessage, messages]
+    [newMessage, fillColour, strokeColour, borderRadius, opacity, borderWidth, blur, shadowIntensity, styleType, gradientStart, gradientEnd, bubbleTimeout]
   )
-
-  const handleFillColourChange = (color: { hex: string }) => {
-    setFillColour(color.hex)
-    console.log(color)
-  }
-
-  const handleStrokeColourChange = (color: { hex: string }) => {
-    setStrokeColour(color.hex)
-    console.log(color)
-  }
 
   const lastMessage = messages[messages.length - 1]
   const dy = lastMessage ? lastMessage.height : 0
 
-  const handleBubbleTimeoutIncrease = () => {
-    setBubbleTimeout(bubbleTimeout + 500)
-  }
-
-  const handleBubbleTimeoutDecrease = () => {
-    setBubbleTimeout(bubbleTimeout - 500)
-  }
-
   return (
     <div className="App">
-      <Chat>
+      <Chat background={chatBackground}>
         <AnimatePresence>
           {messages.map(m => (
             <Bubble
               key={m.id}
               id={m.id}
               dy={dy}
-              fillColour={fillColour}
-              strokeColour={strokeColour}
+              fillColour={m.styleParams?.fillColour || fillColour}
+              strokeColour={m.styleParams?.strokeColour || strokeColour}
+              borderRadius={m.styleParams?.borderRadius || borderRadius}
+              opacity={m.styleParams?.opacity || opacity}
+              borderWidth={m.styleParams?.borderWidth || borderWidth}
+              blur={m.styleParams?.blur || blur}
+              shadowIntensity={m.styleParams?.shadowIntensity || shadowIntensity}
+              styleType={m.styleParams?.styleType || styleType}
+              gradientStart={m.styleParams?.gradientStart || gradientStart}
+              gradientEnd={m.styleParams?.gradientEnd || gradientEnd}
             >
               {m.text}
             </Bubble>
@@ -72,28 +85,181 @@ function App() {
           onSubmit={handleSubmit}
           fillColour={fillColour}
           strokeColour={strokeColour}
+          borderRadius={borderRadius}
+          opacity={opacity}
+          borderWidth={borderWidth}
+          blur={blur}
+          shadowIntensity={shadowIntensity}
+          styleType={styleType}
+          gradientStart={gradientStart}
+          gradientEnd={gradientEnd}
         />
       </Chat>
 
       <div className="picker">
-        <p>Fill</p>
-        <SketchPicker color={fillColour} onChange={handleFillColourChange} />
-        <p>Stroke</p>
-        <SketchPicker
-          color={strokeColour}
-          onChange={handleStrokeColourChange}
-        />
-        <p>Bubble Timeout (Miliseconds)</p>
-        <div>
-          <button onClick={handleBubbleTimeoutDecrease}>-</button>
-          <input
-            type="number"
-            value={bubbleTimeout}
-            onChange={({ target: { value } }) =>
-              setBubbleTimeout(Number(value))
-            }
-          />
-          <button onClick={handleBubbleTimeoutIncrease}>+</button>
+        <h3>Bubble Style Settings</h3>
+        
+        <div className="control-section">
+          <h4>Style Type</h4>
+          <select 
+            value={styleType} 
+            onChange={(e) => setStyleType(e.target.value as BubbleStyle)}
+            className="style-select"
+          >
+            <option value="solid">Solid</option>
+            <option value="glassmorphism">Glassmorphism (毛玻璃)</option>
+            <option value="liquid">Liquid (液态)</option>
+            <option value="neumorphism">Neumorphism</option>
+            <option value="gradient">Gradient</option>
+          </select>
+        </div>
+
+        <div className="control-section">
+          <h4>Colors</h4>
+          <p>Fill / Start Gradient</p>
+          <SketchPicker color={fillColour} onChange={(color) => setFillColour(color.hex)} />
+          
+          {(styleType === 'gradient' || styleType === 'glassmorphism') && (
+            <>
+              <p>Gradient End</p>
+              <SketchPicker color={gradientEnd} onChange={(color) => setGradientEnd(color.hex)} />
+            </>
+          )}
+          
+          <p>Text Color</p>
+          <SketchPicker color={strokeColour} onChange={(color) => setStrokeColour(color.hex)} />
+        </div>
+
+        <div className="control-section">
+          <h4>Shape & Edge</h4>
+          <label>
+            Border Radius: {borderRadius}px
+            <input
+              type="range"
+              min="0"
+              max="60"
+              value={borderRadius}
+              onChange={(e) => setBorderRadius(Number(e.target.value))}
+              className="slider"
+            />
+          </label>
+          
+          <label>
+            Border Width: {borderWidth}px
+            <input
+              type="range"
+              min="0"
+              max="10"
+              value={borderWidth}
+              onChange={(e) => setBorderWidth(Number(e.target.value))}
+              className="slider"
+            />
+          </label>
+        </div>
+
+        <div className="control-section">
+          <h4>Transparency & Effects</h4>
+          <label>
+            Opacity: {(opacity * 100).toFixed(0)}%
+            <input
+              type="range"
+              min="0.1"
+              max="1"
+              step="0.05"
+              value={opacity}
+              onChange={(e) => setOpacity(Number(e.target.value))}
+              className="slider"
+            />
+          </label>
+          
+          <label>
+            Blur Effect: {blur}px
+            <input
+              type="range"
+              min="0"
+              max="30"
+              value={blur}
+              onChange={(e) => setBlur(Number(e.target.value))}
+              className="slider"
+            />
+          </label>
+          
+          <label>
+            Shadow Intensity: {shadowIntensity.toFixed(1)}
+            <input
+              type="range"
+              min="0"
+              max="3"
+              step="0.1"
+              value={shadowIntensity}
+              onChange={(e) => setShadowIntensity(Number(e.target.value))}
+              className="slider"
+            />
+          </label>
+        </div>
+
+        <div className="control-section">
+          <h4>Chat Background</h4>
+          <SketchPicker color={chatBackground} onChange={(color) => setChatBackground(color.hex)} />
+        </div>
+
+        <div className="control-section">
+          <h4>Timing</h4>
+          <p>Bubble Timeout (Milliseconds)</p>
+          <div className="number-control">
+            <button onClick={() => setBubbleTimeout(Math.max(100, bubbleTimeout - 500))}>-</button>
+            <input
+              type="number"
+              value={bubbleTimeout}
+              onChange={({ target: { value } }) => setBubbleTimeout(Number(value))}
+            />
+            <button onClick={() => setBubbleTimeout(bubbleTimeout + 500)}>+</button>
+          </div>
+        </div>
+
+        <div className="style-preview">
+          <h4>Quick Style Presets</h4>
+          <button onClick={() => {
+            setStyleType('glassmorphism')
+            setFillColour('#ffffff')
+            setStrokeColour('#333333')
+            setBorderRadius(20)
+            setOpacity(0.7)
+            setBlur(10)
+            setShadowIntensity(1)
+          }}>🪟 Glassmorphism</button>
+          
+          <button onClick={() => {
+            setStyleType('liquid')
+            setFillColour('#00d4ff')
+            setStrokeColour('#ffffff')
+            setBorderRadius(35)
+            setOpacity(1)
+            setBlur(0)
+            setShadowIntensity(2)
+          }}>💧 Liquid</button>
+          
+          <button onClick={() => {
+            setStyleType('neumorphism')
+            setFillColour('#e0e0e0')
+            setStrokeColour('#333333')
+            setBorderRadius(30)
+            setOpacity(1)
+            setBlur(0)
+            setShadowIntensity(1.5)
+          }}>⬜ Neumorphism</button>
+          
+          <button onClick={() => {
+            setStyleType('gradient')
+            setGradientStart('#667eea')
+            setGradientEnd('#764ba2')
+            setFillColour('#667eea')
+            setStrokeColour('#ffffff')
+            setBorderRadius(25)
+            setOpacity(1)
+            setBlur(0)
+            setShadowIntensity(1.5)
+          }}>🌈 Gradient</button>
         </div>
       </div>
     </div>

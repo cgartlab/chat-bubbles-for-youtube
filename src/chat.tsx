@@ -1,8 +1,20 @@
 import { ReactNode } from 'react'
 import './chat.css'
 
-const Chat = ({ children }: { children: ReactNode }) => {
-  return <div className="chat">{children}</div>
+interface ChatProps {
+  children: ReactNode
+  background?: string
+}
+
+const Chat = ({ children, background }: ChatProps) => {
+  return (
+    <div 
+      className="chat" 
+      style={background ? { background } : {}}
+    >
+      {children}
+    </div>
+  )
 }
 
 export default Chat

@@ -33,7 +33,7 @@
   position: fixed !important;
   top: 12px;
   right: 0;
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--panel-bg);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   padding: 20px;

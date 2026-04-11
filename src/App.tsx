@@ -1,5 +1,5 @@
 import { AnimatePresence } from 'framer-motion'
-import { useCallback, useState } from 'react'
+import { ReactNode, useCallback, useState } from 'react'
 import './App.css'
 import Bubble, { BubbleStyle } from './bubble'
 import BubbleInput from './bubble-input'
@@ -7,14 +7,61 @@ import Chat from './chat'
 import useMessages from './use-messages'
 import { SketchPicker } from 'react-color'
 
+type SectionKey = 'appearance' | 'colors' | 'effects' | 'timing' | 'presets'
+
+interface ControlSectionProps {
+  title: string
+  sectionKey: SectionKey
+  collapsed: boolean
+  onToggle: (key: SectionKey) => void
+  children: ReactNode
+  className?: string
+}
+
+const ControlSection = ({
+  title,
+  sectionKey,
+  collapsed,
+  onToggle,
+  children,
+  className
+}: ControlSectionProps) => {
+  const sectionId = `section-${sectionKey}`
+
+  return (
+    <div className={`control-section ${className || ''}`.trim()}>
+      <button
+        type="button"
+        className="section-toggle"
+        onClick={() => onToggle(sectionKey)}
+        aria-expanded={!collapsed}
+        aria-controls={sectionId}
+      >
+        <h4>{title}</h4>
+        <span>{collapsed ? '展开' : '收起'}</span>
+      </button>
+      <div id={sectionId} className="section-content" hidden={collapsed}>
+        {children}
+      </div>
+    </div>
+  )
+}
+
 function App() {
   const [messages, addMessage] = useMessages([])
   const [newMessage, setNewMessage] = useState('')
   const [fillColour, setFillColour] = useState('#6366f1')
   const [strokeColour, setStrokeColour] = useState('#ffffff')
   const [bubbleTimeout, setBubbleTimeout] = useState(500)
-  
-  // New style parameters
+  const [panelCollapsed, setPanelCollapsed] = useState(false)
+  const [sectionCollapsed, setSectionCollapsed] = useState<Record<SectionKey, boolean>>({
+    appearance: false,
+    colors: false,
+    effects: false,
+    timing: false,
+    presets: false
+  })
+
   const [borderRadius, setBorderRadius] = useState(30)
   const [opacity, setOpacity] = useState(1)
   const [borderWidth, setBorderWidth] = useState(0)
@@ -24,6 +71,10 @@ function App() {
   const [gradientStart, setGradientStart] = useState('#6366f1')
   const [gradientEnd, setGradientEnd] = useState('#8b5cf6')
   const [chatBackground, setChatBackground] = useState('#00a000')
+
+  const toggleSection = (key: SectionKey) => {
+    setSectionCollapsed(prev => ({ ...prev, [key]: !prev[key] }))
+  }
 
   const handleSubmit = useCallback(
     (bubbleHeight: number) => {
@@ -49,7 +100,21 @@ function App() {
         setNewMessage('')
       }
     },
-    [newMessage, fillColour, strokeColour, borderRadius, opacity, borderWidth, blur, shadowIntensity, styleType, gradientStart, gradientEnd, bubbleTimeout]
+    [
+      addMessage,
+      blur,
+      borderRadius,
+      borderWidth,
+      bubbleTimeout,
+      fillColour,
+      gradientEnd,
+      gradientStart,
+      newMessage,
+      opacity,
+      shadowIntensity,
+      strokeColour,
+      styleType
+    ]
   )
 
   const lastMessage = messages[messages.length - 1]
@@ -96,7 +161,23 @@ function App() {
         />
       </Chat>
 
-      <div className="picker">
+      <button
+        type="button"
+        className={`panel-toggle ${panelCollapsed ? 'collapsed' : 'expanded'}`}
+        onClick={() => setPanelCollapsed(prev => !prev)}
+        aria-expanded={!panelCollapsed}
+        aria-controls="style-control-panel"
+        aria-label={panelCollapsed ? '打开样式面板' : '收起样式面板'}
+      >
+        <span className="panel-toggle-icon">{panelCollapsed ? '⚙️' : '✕'}</span>
+        <span className="panel-toggle-text">{panelCollapsed ? '打开面板' : '收起面板'}</span>
+      </button>
+
+      <aside
+        className={`picker ${panelCollapsed ? 'picker-hidden' : ''}`}
+        id="style-control-panel"
+        aria-hidden={panelCollapsed}
+      >
         <h3>Bubble Style Settings</h3>
 
         <details className="control-section preset-group" open>
@@ -160,7 +241,6 @@ function App() {
             <option value="neumorphism">Neumorphism</option>
             <option value="gradient">Gradient</option>
           </select>
-        </div>
 
         <div className="control-section">
           <h4>Colors</h4>
@@ -187,11 +267,11 @@ function App() {
               min="0"
               max="60"
               value={borderRadius}
-              onChange={(e) => setBorderRadius(Number(e.target.value))}
+              onChange={e => setBorderRadius(Number(e.target.value))}
               className="slider"
             />
           </label>
-          
+
           <label>
             Border Width: {borderWidth}px
             <input
@@ -199,14 +279,41 @@ function App() {
               min="0"
               max="10"
               value={borderWidth}
-              onChange={(e) => setBorderWidth(Number(e.target.value))}
+              onChange={e => setBorderWidth(Number(e.target.value))}
               className="slider"
             />
           </label>
-        </div>
+        </ControlSection>
 
-        <div className="control-section">
-          <h4>Transparency & Effects</h4>
+        <ControlSection
+          title="Colors"
+          sectionKey="colors"
+          collapsed={sectionCollapsed.colors}
+          onToggle={toggleSection}
+        >
+          <p>Fill / Start Gradient</p>
+          <SketchPicker color={fillColour} onChange={color => setFillColour(color.hex)} />
+
+          {(styleType === 'gradient' || styleType === 'glassmorphism') && (
+            <>
+              <p>Gradient End</p>
+              <SketchPicker color={gradientEnd} onChange={color => setGradientEnd(color.hex)} />
+            </>
+          )}
+
+          <p>Text Color</p>
+          <SketchPicker color={strokeColour} onChange={color => setStrokeColour(color.hex)} />
+
+          <p>Chat Background</p>
+          <SketchPicker color={chatBackground} onChange={color => setChatBackground(color.hex)} />
+        </ControlSection>
+
+        <ControlSection
+          title="Effects"
+          sectionKey="effects"
+          collapsed={sectionCollapsed.effects}
+          onToggle={toggleSection}
+        >
           <label>
             Opacity: {(opacity * 100).toFixed(0)}%
             <input
@@ -215,11 +322,11 @@ function App() {
               max="1"
               step="0.05"
               value={opacity}
-              onChange={(e) => setOpacity(Number(e.target.value))}
+              onChange={e => setOpacity(Number(e.target.value))}
               className="slider"
             />
           </label>
-          
+
           <label>
             Blur Effect: {blur}px
             <input
@@ -227,11 +334,11 @@ function App() {
               min="0"
               max="30"
               value={blur}
-              onChange={(e) => setBlur(Number(e.target.value))}
+              onChange={e => setBlur(Number(e.target.value))}
               className="slider"
             />
           </label>
-          
+
           <label>
             Shadow Intensity: {shadowIntensity.toFixed(1)}
             <input
@@ -240,30 +347,30 @@ function App() {
               max="3"
               step="0.1"
               value={shadowIntensity}
-              onChange={(e) => setShadowIntensity(Number(e.target.value))}
+              onChange={e => setShadowIntensity(Number(e.target.value))}
               className="slider"
             />
           </label>
-        </div>
-
-        <div className="control-section">
-          <h4>Chat Background</h4>
-          <SketchPicker color={chatBackground} onChange={(color) => setChatBackground(color.hex)} />
-        </div>
+        </ControlSection>
 
         <div className="control-section">
           <h4>Timing</h4>
           <p className="field-caption">Bubble Timeout (Milliseconds)</p>
           <div className="number-control">
-            <button onClick={() => setBubbleTimeout(Math.max(100, bubbleTimeout - 500))}>-</button>
+            <button type="button" onClick={() => setBubbleTimeout(Math.max(100, bubbleTimeout - 500))}>
+              -
+            </button>
             <input
               type="number"
+              min="100"
               value={bubbleTimeout}
-              onChange={({ target: { value } }) => setBubbleTimeout(Number(value))}
+              onChange={({ target: { value } }) => setBubbleTimeout(Math.max(100, Number(value) || 100))}
             />
-            <button onClick={() => setBubbleTimeout(bubbleTimeout + 500)}>+</button>
+            <button type="button" onClick={() => setBubbleTimeout(bubbleTimeout + 500)}>
+              +
+            </button>
           </div>
-        </div>
+        </ControlSection>
 
       </div>
     </div>

@@ -180,16 +180,59 @@ function App() {
       >
         <h3>Bubble Style Settings</h3>
 
-        <ControlSection
-          title="Appearance"
-          sectionKey="appearance"
-          collapsed={sectionCollapsed.appearance}
-          onToggle={toggleSection}
-        >
-          <p>Style Type</p>
-          <select
-            value={styleType}
-            onChange={e => setStyleType(e.target.value as BubbleStyle)}
+        <details className="control-section preset-group" open>
+          <summary>Presets</summary>
+          <div className="style-preview">
+            <h4>Quick Style Presets</h4>
+            <button onClick={() => {
+              setStyleType('glassmorphism')
+              setFillColour('#ffffff')
+              setStrokeColour('#333333')
+              setBorderRadius(20)
+              setOpacity(0.7)
+              setBlur(10)
+              setShadowIntensity(1)
+            }}>🪟 Glassmorphism</button>
+
+            <button onClick={() => {
+              setStyleType('liquid')
+              setFillColour('#00d4ff')
+              setStrokeColour('#ffffff')
+              setBorderRadius(35)
+              setOpacity(1)
+              setBlur(0)
+              setShadowIntensity(2)
+            }}>💧 Liquid</button>
+
+            <button onClick={() => {
+              setStyleType('neumorphism')
+              setFillColour('#e0e0e0')
+              setStrokeColour('#333333')
+              setBorderRadius(30)
+              setOpacity(1)
+              setBlur(0)
+              setShadowIntensity(1.5)
+            }}>⬜ Neumorphism</button>
+
+            <button onClick={() => {
+              setStyleType('gradient')
+              setGradientStart('#667eea')
+              setGradientEnd('#764ba2')
+              setFillColour('#667eea')
+              setStrokeColour('#ffffff')
+              setBorderRadius(25)
+              setOpacity(1)
+              setBlur(0)
+              setShadowIntensity(1.5)
+            }}>🌈 Gradient</button>
+          </div>
+        </details>
+        
+        <div className="control-section">
+          <h4>Style Type</h4>
+          <select 
+            value={styleType} 
+            onChange={(e) => setStyleType(e.target.value as BubbleStyle)}
             className="style-select"
           >
             <option value="solid">Solid</option>
@@ -199,6 +242,24 @@ function App() {
             <option value="gradient">Gradient</option>
           </select>
 
+        <div className="control-section">
+          <h4>Colors</h4>
+          <p className="field-caption">Fill / Start Gradient</p>
+          <SketchPicker color={fillColour} onChange={(color) => setFillColour(color.hex)} />
+          
+          {(styleType === 'gradient' || styleType === 'glassmorphism') && (
+            <>
+              <p className="field-caption">Gradient End</p>
+              <SketchPicker color={gradientEnd} onChange={(color) => setGradientEnd(color.hex)} />
+            </>
+          )}
+          
+          <p className="field-caption">Text Color</p>
+          <SketchPicker color={strokeColour} onChange={(color) => setStrokeColour(color.hex)} />
+        </div>
+
+        <div className="control-section">
+          <h4>Shape & Edge</h4>
           <label>
             Border Radius: {borderRadius}px
             <input
@@ -292,13 +353,9 @@ function App() {
           </label>
         </ControlSection>
 
-        <ControlSection
-          title="Timing"
-          sectionKey="timing"
-          collapsed={sectionCollapsed.timing}
-          onToggle={toggleSection}
-        >
-          <p>Bubble Timeout (Milliseconds)</p>
+        <div className="control-section">
+          <h4>Timing</h4>
+          <p className="field-caption">Bubble Timeout (Milliseconds)</p>
           <div className="number-control">
             <button type="button" onClick={() => setBubbleTimeout(Math.max(100, bubbleTimeout - 500))}>
               -
@@ -315,80 +372,7 @@ function App() {
           </div>
         </ControlSection>
 
-        <ControlSection
-          title="Quick Style Presets"
-          sectionKey="presets"
-          collapsed={sectionCollapsed.presets}
-          onToggle={toggleSection}
-          className="style-preview"
-        >
-          <button
-            type="button"
-            className="preset-button"
-            onClick={() => {
-              setStyleType('glassmorphism')
-              setFillColour('#ffffff')
-              setStrokeColour('#333333')
-              setBorderRadius(20)
-              setOpacity(0.7)
-              setBlur(10)
-              setShadowIntensity(1)
-            }}
-          >
-            🪟 Glassmorphism
-          </button>
-
-          <button
-            type="button"
-            className="preset-button"
-            onClick={() => {
-              setStyleType('liquid')
-              setFillColour('#00d4ff')
-              setStrokeColour('#ffffff')
-              setBorderRadius(35)
-              setOpacity(1)
-              setBlur(0)
-              setShadowIntensity(2)
-            }}
-          >
-            💧 Liquid
-          </button>
-
-          <button
-            type="button"
-            className="preset-button"
-            onClick={() => {
-              setStyleType('neumorphism')
-              setFillColour('#e0e0e0')
-              setStrokeColour('#333333')
-              setBorderRadius(30)
-              setOpacity(1)
-              setBlur(0)
-              setShadowIntensity(1.5)
-            }}
-          >
-            ⬜ Neumorphism
-          </button>
-
-          <button
-            type="button"
-            className="preset-button"
-            onClick={() => {
-              setStyleType('gradient')
-              setGradientStart('#667eea')
-              setGradientEnd('#764ba2')
-              setFillColour('#667eea')
-              setStrokeColour('#ffffff')
-              setBorderRadius(25)
-              setOpacity(1)
-              setBlur(0)
-              setShadowIntensity(1.5)
-            }}
-          >
-            🌈 Gradient
-          </button>
-        </ControlSection>
-      </aside>
+      </div>
     </div>
   )
 }

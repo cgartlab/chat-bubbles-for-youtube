@@ -230,9 +230,9 @@ function App() {
         
         <div className="control-section">
           <h4>Style Type</h4>
-          <select 
-            value={styleType} 
-            onChange={(e) => setStyleType(e.target.value as BubbleStyle)}
+          <select
+            value={styleType}
+            onChange={e => setStyleType(e.target.value as BubbleStyle)}
             className="style-select"
           >
             <option value="solid">Solid</option>
@@ -241,25 +241,14 @@ function App() {
             <option value="neumorphism">Neumorphism</option>
             <option value="gradient">Gradient</option>
           </select>
-
-        <div className="control-section">
-          <h4>Colors</h4>
-          <p className="field-caption">Fill / Start Gradient</p>
-          <SketchPicker color={fillColour} onChange={(color) => setFillColour(color.hex)} />
-          
-          {(styleType === 'gradient' || styleType === 'glassmorphism') && (
-            <>
-              <p className="field-caption">Gradient End</p>
-              <SketchPicker color={gradientEnd} onChange={(color) => setGradientEnd(color.hex)} />
-            </>
-          )}
-          
-          <p className="field-caption">Text Color</p>
-          <SketchPicker color={strokeColour} onChange={(color) => setStrokeColour(color.hex)} />
         </div>
 
-        <div className="control-section">
-          <h4>Shape & Edge</h4>
+        <ControlSection
+          title="Appearance"
+          sectionKey="appearance"
+          collapsed={sectionCollapsed.appearance}
+          onToggle={toggleSection}
+        >
           <label>
             Border Radius: {borderRadius}px
             <input
@@ -370,9 +359,9 @@ function App() {
               +
             </button>
           </div>
-        </ControlSection>
+        </div>
 
-      </div>
+      </aside>
     </div>
   )
 }

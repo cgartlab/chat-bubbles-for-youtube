@@ -164,17 +164,17 @@ function App() {
 
         <div className="control-section">
           <h4>Colors</h4>
-          <p>Fill / Start Gradient</p>
+          <p className="field-caption">Fill / Start Gradient</p>
           <SketchPicker color={fillColour} onChange={(color) => setFillColour(color.hex)} />
           
           {(styleType === 'gradient' || styleType === 'glassmorphism') && (
             <>
-              <p>Gradient End</p>
+              <p className="field-caption">Gradient End</p>
               <SketchPicker color={gradientEnd} onChange={(color) => setGradientEnd(color.hex)} />
             </>
           )}
           
-          <p>Text Color</p>
+          <p className="field-caption">Text Color</p>
           <SketchPicker color={strokeColour} onChange={(color) => setStrokeColour(color.hex)} />
         </div>
 
@@ -253,7 +253,7 @@ function App() {
 
         <div className="control-section">
           <h4>Timing</h4>
-          <p>Bubble Timeout (Milliseconds)</p>
+          <p className="field-caption">Bubble Timeout (Milliseconds)</p>
           <div className="number-control">
             <button onClick={() => setBubbleTimeout(Math.max(100, bubbleTimeout - 500))}>-</button>
             <input

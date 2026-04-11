@@ -98,6 +98,54 @@ function App() {
 
       <div className="picker">
         <h3>Bubble Style Settings</h3>
+
+        <details className="control-section preset-group" open>
+          <summary>Presets</summary>
+          <div className="style-preview">
+            <h4>Quick Style Presets</h4>
+            <button onClick={() => {
+              setStyleType('glassmorphism')
+              setFillColour('#ffffff')
+              setStrokeColour('#333333')
+              setBorderRadius(20)
+              setOpacity(0.7)
+              setBlur(10)
+              setShadowIntensity(1)
+            }}>🪟 Glassmorphism</button>
+
+            <button onClick={() => {
+              setStyleType('liquid')
+              setFillColour('#00d4ff')
+              setStrokeColour('#ffffff')
+              setBorderRadius(35)
+              setOpacity(1)
+              setBlur(0)
+              setShadowIntensity(2)
+            }}>💧 Liquid</button>
+
+            <button onClick={() => {
+              setStyleType('neumorphism')
+              setFillColour('#e0e0e0')
+              setStrokeColour('#333333')
+              setBorderRadius(30)
+              setOpacity(1)
+              setBlur(0)
+              setShadowIntensity(1.5)
+            }}>⬜ Neumorphism</button>
+
+            <button onClick={() => {
+              setStyleType('gradient')
+              setGradientStart('#667eea')
+              setGradientEnd('#764ba2')
+              setFillColour('#667eea')
+              setStrokeColour('#ffffff')
+              setBorderRadius(25)
+              setOpacity(1)
+              setBlur(0)
+              setShadowIntensity(1.5)
+            }}>🌈 Gradient</button>
+          </div>
+        </details>
         
         <div className="control-section">
           <h4>Style Type</h4>
@@ -217,50 +265,6 @@ function App() {
           </div>
         </div>
 
-        <div className="style-preview">
-          <h4>Quick Style Presets</h4>
-          <button onClick={() => {
-            setStyleType('glassmorphism')
-            setFillColour('#ffffff')
-            setStrokeColour('#333333')
-            setBorderRadius(20)
-            setOpacity(0.7)
-            setBlur(10)
-            setShadowIntensity(1)
-          }}>🪟 Glassmorphism</button>
-          
-          <button onClick={() => {
-            setStyleType('liquid')
-            setFillColour('#00d4ff')
-            setStrokeColour('#ffffff')
-            setBorderRadius(35)
-            setOpacity(1)
-            setBlur(0)
-            setShadowIntensity(2)
-          }}>💧 Liquid</button>
-          
-          <button onClick={() => {
-            setStyleType('neumorphism')
-            setFillColour('#e0e0e0')
-            setStrokeColour('#333333')
-            setBorderRadius(30)
-            setOpacity(1)
-            setBlur(0)
-            setShadowIntensity(1.5)
-          }}>⬜ Neumorphism</button>
-          
-          <button onClick={() => {
-            setStyleType('gradient')
-            setGradientStart('#667eea')
-            setGradientEnd('#764ba2')
-            setFillColour('#667eea')
-            setStrokeColour('#ffffff')
-            setBorderRadius(25)
-            setOpacity(1)
-            setBlur(0)
-            setShadowIntensity(1.5)
-          }}>🌈 Gradient</button>
-        </div>
       </div>
     </div>
   )

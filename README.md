@@ -57,6 +57,24 @@
 
 ## 快速开始
 
+- [x] feat: add keyboard sound option (cuz not all users have great sound keyboard and mic)
+-> Solution: https://github.com/hainguyents13/mechvibes
+
+## Branch strategy
+
+To keep this repo maintainable, use a lightweight trunk-based workflow:
+
+- **Protected branch**: `main` (or `master` in legacy repos) should be the default branch and protected.
+- **Working branch**: short-lived branches like `feature/*`, `fix/*`, `chore/*` are created from default branch.
+- **Merge policy**: prefer small, frequent PRs; delete merged branches after PR completion.
+- **Release**: tag releases from default branch (`vX.Y.Z`). If hotfix is needed, create `hotfix/*` from latest tag and merge back.
+
+Branch cleanup checklist:
+
+1. Confirm branches to keep: at minimum keep `main/master` and the active development branch.
+2. Delete merged local branches first.
+3. Delete corresponding remote branches.
+4. If default branch must change, switch default in hosting platform first, then delete old default branch.
 ### 安装依赖
 ```bash
 npm install

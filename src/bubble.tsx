@@ -75,12 +75,12 @@ const Bubble = ({
     }
   }
 
-  // Keep a consistent iMessage-like contour for all bubble styles
+  // Generate border radius based on style type
   const getBorderRadius = () => {
-    const top = borderRadius + 6
-    const bottomRight = Math.max(borderRadius - 4, 14)
-    const bottomLeft = Math.max(borderRadius - 10, 10)
-    return `${top}px ${top}px ${bottomRight}px ${bottomLeft}px`
+    if (styleType === 'liquid') {
+      return `${borderRadius}px ${borderRadius + 10}px ${borderRadius - 5}px ${borderRadius + 5}px`
+    }
+    return `${borderRadius}px`
   }
 
   // Generate box shadow based on style type

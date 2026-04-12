@@ -1,4 +1,4 @@
-import { AnimatePresence } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
 import { ReactNode, useCallback, useState } from 'react'
 import './App.css'
 import Bubble, { BubbleStyle } from './bubble'
@@ -40,9 +40,21 @@ const ControlSection = ({
         <h4>{title}</h4>
         <span>{collapsed ? '展开' : '收起'}</span>
       </button>
-      <div id={sectionId} className="section-content" hidden={collapsed}>
-        {children}
-      </div>
+      <AnimatePresence initial={false}>
+        {!collapsed && (
+          <motion.div
+            id={sectionId}
+            className="section-content"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3, ease: 'easeInOut' }}
+            style={{ overflow: 'hidden' }}
+          >
+            {children}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
@@ -74,6 +86,26 @@ function App() {
 
   const toggleSection = (key: SectionKey) => {
     setSectionCollapsed(prev => ({ ...prev, [key]: !prev[key] }))
+  }
+
+  const expandAll = () => {
+    setSectionCollapsed(prev => {
+      const newState = { ...prev }
+      Object.keys(newState).forEach(key => {
+        newState[key as SectionKey] = false
+      })
+      return newState
+    })
+  }
+
+  const collapseAll = () => {
+    setSectionCollapsed(prev => {
+      const newState = { ...prev }
+      Object.keys(newState).forEach(key => {
+        newState[key as SectionKey] = true
+      })
+      return newState
+    })
   }
 
   const handleSubmit = useCallback(
@@ -179,6 +211,45 @@ function App() {
         aria-hidden={panelCollapsed}
       >
         <h3>Bubble Style Settings</h3>
+
+        <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
+          <button
+            type="button"
+            onClick={expandAll}
+            style={{
+              flex: 1,
+              height: '32px',
+              padding: '0 12px',
+              border: '1px solid var(--stroke)',
+              borderRadius: '9px',
+              background: 'var(--control-bg)',
+              color: 'var(--text-primary)',
+              fontSize: '12px',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease'
+            }}
+          >
+            展开全部
+          </button>
+          <button
+            type="button"
+            onClick={collapseAll}
+            style={{
+              flex: 1,
+              height: '32px',
+              padding: '0 12px',
+              border: '1px solid var(--stroke)',
+              borderRadius: '9px',
+              background: 'var(--control-bg)',
+              color: 'var(--text-primary)',
+              fontSize: '12px',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease'
+            }}
+          >
+            收起全部
+          </button>
+        </div>
 
         <details className="control-section preset-group" open>
           <summary>Presets</summary>
